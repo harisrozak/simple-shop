@@ -123,6 +123,7 @@ class Simple_Shop {
 		 * side of the site.
 		 */
 		require_once plugin_dir_path( dirname( __FILE__ ) ) . 'public/class-simple-shop-public.php';
+		require_once plugin_dir_path( dirname( __FILE__ ) ) . 'public/public-order.php';
 
 		$this->loader = new Simple_Shop_Loader();
 
@@ -158,11 +159,13 @@ class Simple_Shop {
 		$admin_order = new Simple_Shop_Admin_Order( $this->get_simple_shop(), $this->get_version() );
 		$admin_product = new Simple_Shop_Admin_Product( $this->get_simple_shop(), $this->get_version() );
 
+		// enqueue script
 		$this->loader->add_action( 'admin_enqueue_scripts', $plugin_admin, 'enqueue_styles' );
 		$this->loader->add_action( 'admin_enqueue_scripts', $plugin_admin, 'enqueue_scripts' );
 
+		// register post types
 		$this->loader->add_action( 'init', $admin_order, 'register_post_type' );
-		$this->loader->add_action( 'init', $admin_product, 'register_post_type' );
+		$this->loader->add_action( 'init', $admin_product, 'register_post_type' );		
 
 	}
 
@@ -176,9 +179,14 @@ class Simple_Shop {
 	private function define_public_hooks() {
 
 		$plugin_public = new Simple_Shop_Public( $this->get_simple_shop(), $this->get_version() );
+		$public_order = new Simple_Shop_Public_Order( $this->get_simple_shop(), $this->get_version() );
 
+		// enqueue script
 		$this->loader->add_action( 'wp_enqueue_scripts', $plugin_public, 'enqueue_styles' );
 		$this->loader->add_action( 'wp_enqueue_scripts', $plugin_public, 'enqueue_scripts' );
+
+		// action to save public order post data
+		$this->loader->add_action( 'simple_post_save_public_order_post_data', $public_order, 'save_public_order_post_data' );
 
 	}
 
